@@ -1,0 +1,37 @@
+[package]
+name = "pico-aprs-beacon"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+alloc = []
+
+[dependencies]
+cortex-m = "0.7"
+cortex-m-rt = "0.7"
+embedded-hal = "1.0.0"
+embedded-hal-error = "0.3.0"
+
+critical-section = {version = "1.2.0"}
+defmt = "1"
+defmt-rtt = "1"
+embedded-graphics = "0.8.1"
+heapless = "0.8.0"
+panic-probe = {version = "1", features = ["print-defmt"]}
+panic-halt = "1"
+pio-proc = "0.2"
+pio = "0.2"
+portable-atomic = {version = "1.7.0", features = ["critical-section"]}
+rp-pico = "0.9"
+rp-binary-info = "0.1.1"
+#embedded-alloc = "0.6.0"
+
+nmea = {version = "0.7.0", default-features = false, features = ["GNSS"]}
+
+[build-dependencies]
+toml = "0.8"
+
+[[bin]]
+name = "pico-aprs-beacon"
+test = false
+bench = false

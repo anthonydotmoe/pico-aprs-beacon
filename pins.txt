@@ -1,0 +1,16 @@
+Pins:
+
+GPS TX         = GP0 (UART0)
+GPS RX         = GP1 (UART0)
+
+I2S Data       = GP20
+I2S Bit Clock  = GP21
+IS2 Word Sel   = GP22
+
+Radio audio in = GP26 (ADC0)
+Radio PTT      = GP15
+
+Sharp Memory Display
+SPI0 TX        = GP19
+SPI0 SCK       = GP18
+SPI0 CS        = GP17

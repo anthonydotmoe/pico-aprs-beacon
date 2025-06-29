@@ -1,0 +1,24 @@
+; Transmit a mono 16-bit I2S audio stream as stereo
+; The output pin is used for data output
+; Two side-set pins are used for LRCLK and BCLK
+;
+; Autopull must be enabled
+
+.program audio_i2s
+.side_set 2
+
+                    ;          ┌── LRCLK
+                    ;          │┌─ BCLK
+public entry_point: ;          ││
+    set x, 14           side 0b11
+    
+bitloop1:
+    out pins, 1         side 0b10
+    jmp x-- bitloop1    side 0b11
+    out pins, 1         side 0b00
+    set x, 14           side 0b01
+
+bitloop0:
+    out pins, 1         side 0b00
+    jmp x-- bitloop0    side 0b01
+    out pins, 1         side 0b10

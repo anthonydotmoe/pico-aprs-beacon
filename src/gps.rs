@@ -27,14 +27,11 @@ impl GpsTask {
             while let Some(b) = q.dequeue() {
                 if b == b'\n' {
                     // Full line acquired
-                    //let head = &self.line_buf[..10];
-                    //println!("{}", head);
+                    let head = &self.line_buf[..10];
 
-                    //TODO: If let ret = Error, print head
-                    let ret = shared.nmea.parse(self.line_buf.as_str());
-                    //let mut string = heapless::String::<1024>::new();
-                    //let _ = core::fmt::write(&mut string, format_args!("Ret: {:?}\n{}", ret, shared.nmea));
-                    //println!("{}", string.as_str());
+                    if let Err(_) = shared.nmea.parse(self.line_buf.as_str()) {
+                        println!("Error with: \"{}\"", head);
+                    }
 
                     self.line_buf.clear();
                 } else if b != b'\r' {

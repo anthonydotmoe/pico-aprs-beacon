@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Proof of concept APRS modulator for
 # reference when building the Rust version
 
@@ -15,6 +16,7 @@ POSTPEND = 3
 # Frequencies
 MARK  = 1200
 SPACE = 2200
+CALLSIGN = "N0CALL"
 
 def bit_stuff(bits):
     stuffed = []
@@ -70,8 +72,8 @@ def build_ax25_frame():
     # Destination: APRS-0
     frame += encode_ax25_callsign("APZ")
 
-    # Source: N0CALL-7 (Handheld/portable)
-    frame += encode_ax25_callsign("N0CALL", 7)
+    # Source: {CALLSIGN}-7 (Handheld/portable)
+    frame += encode_ax25_callsign(f"{CALLSIGN}", 7)
 
     # Digipeater path
     frame += encode_ax25_callsign("WIDE1", 1, last=True)
@@ -164,6 +166,7 @@ def generate_afsk_audio(bits):
 
 # Build the data
 frame = build_ax25_frame()
+print(f"{frame}")
 bitstream = ax25_bitstream(frame)
 
 # Generate audio samples

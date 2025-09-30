@@ -25,6 +25,7 @@ impl Shared {
             SentenceType::RMC,
             SentenceType::VTG,
         ]).unwrap();
+
         Self {
             nmea
         }

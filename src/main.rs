@@ -31,6 +31,9 @@ mod hardware;
 //mod modem;
 mod sched;
 
+
+// TODO: Figure out why I need this `global_allocator`
+
 /*
 #[cfg(feature = "alloc")]
 #[global_allocator]
@@ -48,12 +51,11 @@ unsafe impl GlobalAlloc for Dumb {
         panic!("You called alloc!");
         null_mut()
     }
-    unsafe fn dealloc(&self, _ptr: *mut u8, _layout: core::alloc::Layout) {
-    }
+    unsafe fn dealloc(&self, _ptr: *mut u8, _layout: core::alloc::Layout) {}
 }
 
 pub mod co {
-    pub const MYCALL: &'static str = "N0CALL";
+    pub const MYCALL: &'static str = "N0CALL-7";
     pub const TOCALL: &'static str = "APZ   ";
     pub const UART_BUFFER_SIZE: usize = 2048;
 }

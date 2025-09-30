@@ -5,7 +5,7 @@ use rp_pico::hal::rom_data::double_funcs::{dmul, double_to_int};
 /// High-level APRS info field representation
 pub enum AprsInfo {
     Position(PositionReport),
-    Unknown(u8, heapless::Vec<u8, 255>),
+    Unknown(u8, heapless::Vec<u8, 256>),
 }
 
 #[derive(Debug)]
@@ -51,7 +51,11 @@ impl Coordinate {
         let minutes = frac * 60 / 1_000_000;
         let hundredths = ((frac * 60_00 / 1_000_000) % 100) as u8;
 
-        write!(out, "{:02}{:02}.{:02}", deg, minutes, hundredths)?;
+        if lat {
+            write!(out, "{:02}{:02}.{:02}", deg, minutes, hundredths)?;
+        } else {
+            write!(out, "{:03}{:02}.{:02}", deg, minutes, hundredths)?;
+        }
 
         let suffix = match (lat, self.microdegrees >= 0) {
             (true, true) => 'N',
@@ -109,4 +113,32 @@ impl PositionReport {
 
         Ok(())
     }
+}
+
+fn split_callsign_ssid(input: &str) -> (&str, u8) {
+    let (call, ssid) = match input.split_once('-') {
+        Some((call, ssid)) => (call.trim(), ssid),
+        None => (input.trim(), "0"),
+    };
+
+    let ssid = ssid.parse::<u8>().unwrap_or(0);
+    (call, ssid)
+}
+
+pub fn build_position_frame(
+    report: &PositionReport,
+) -> Result<heapless::Vec<u8, {crate::ax25::MAX_FRAME_LEN}>, ()> {
+    use crate::ax25::{self, AddressField};
+
+    let (dest_call, dest_ssid) = split_callsign_ssid(crate::co::TOCALL);
+    let (src_call, src_ssid) = split_callsign_ssid(crate::co::MYCALL);
+
+    let dest = AddressField::from_text(dest_call, dest_ssid)?;
+    let src = AddressField::from_text(src_call, src_ssid)?;
+    let digipeaters = [AddressField::from_text("WIDE1", 1)?];
+
+    let mut info = heapless::String::<{ crate::ax25::MAX_INFO_LEN }>::new();
+    report.encode(&mut info)?;
+
+    ax25::build_ui_frame(dest, src, &digipeaters, info.as_bytes())
 }

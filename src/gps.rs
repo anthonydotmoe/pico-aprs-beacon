@@ -23,14 +23,14 @@ impl GpsTask {
         self.next_run_at = now + 900; // 1 second + a little more
 
         use_queue(|mut q| {
-            println!("Queue: {}", q.len());
+            //println!("Queue: {}", q.len());
             while let Some(b) = q.dequeue() {
                 if b == b'\n' {
                     // Full line acquired
-                    let head = &self.line_buf[..10];
+                    //let head = &self.line_buf[..10]; // TODO: Can index out of bounds
 
                     if let Err(_) = shared.nmea.parse(self.line_buf.as_str()) {
-                        println!("Error with: \"{}\"", head);
+                        //println!("Error with: \"{}\"", head);
                     }
 
                     self.line_buf.clear();

@@ -18,7 +18,7 @@ pub struct UartHandler {
 
 impl UartHandler {
     pub fn new(mut uart: GpsUart) -> Self {
-        let init_cmd = "PMTK314,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0";
+        let init_cmd = "$PMTK314,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n";
         uart.write_full_blocking(init_cmd.as_bytes());
         uart.enable_rx_interrupt();
         unsafe { pac::NVIC::unmask(pac::interrupt::UART0_IRQ); }

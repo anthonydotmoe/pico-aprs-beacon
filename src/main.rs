@@ -25,10 +25,12 @@ use hal::pac;
 mod app;
 mod aprs;
 mod ax25;
+mod beacon;
+mod bitstream;
 mod display;
 mod gps;
 mod hardware;
-//mod modem;
+mod modem;
 mod sched;
 
 
@@ -55,9 +57,9 @@ unsafe impl GlobalAlloc for Dumb {
 }
 
 pub mod co {
-    pub const MYCALL: &'static str = "N0CALL-7";
+    pub const MYCALL: &'static str = "N0CALL-1";
     pub const TOCALL: &'static str = "APZ   ";
-    pub const UART_BUFFER_SIZE: usize = 2048;
+    pub const UART_BUFFER_SIZE: usize = 4096;
 }
 
 // Entry point

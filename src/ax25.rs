@@ -1,8 +1,20 @@
 use heapless::Vec;
 
+use crate::bitstream::Bitstream;
+
+pub const BEGIN_FLAGS: usize = 75;
+pub const END_FLAGS: usize = 3;
 pub const MAX_DIGIPEATERS: usize = 8;
 pub const MAX_INFO_LEN: usize = 256;
 pub const MAX_FRAME_LEN: usize = 330;
+pub const MAX_TX_BITS: usize = {
+    let d = 8 * MAX_FRAME_LEN; // raw data bits
+    let s = d / 5;             // worst-case stuffed bits
+    d + s + 8 * (BEGIN_FLAGS + END_FLAGS)
+};
+pub const MAX_TX_BYTES: usize = (MAX_TX_BITS + 7) / 8;
+
+pub type TxBits = Bitstream<MAX_TX_BYTES>;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct AddressField {
@@ -115,6 +127,55 @@ pub fn build_ui_frame(
     frame.push((crc >> 8) as u8).map_err(|_| ())?;
 
     Ok(frame)
+}
+
+/// Builds the full on-air bitstream: BEGIN_FLAGS + stuffed frame + END_FLAGS.
+pub fn build_on_air(
+    frame: Vec<u8, MAX_FRAME_LEN>,
+) -> Result<TxBits, ()> {
+    let mut bs = Bitstream::new();
+    write_flags(&mut bs, BEGIN_FLAGS)?;
+    write_frame_stuffed(&mut bs, frame.as_slice())?;
+    write_flags(&mut bs, END_FLAGS)?;
+    bs.finish()?;
+    Ok(bs)
+}
+
+#[inline]
+fn push_byte_raw(bs: &mut TxBits, b: u8) -> Result<(), ()> {
+    // AX.25/HDLC sends LSB-first
+    for i in 0..8 {
+        bs.push_bit(((b >> i) & 1) != 0)?;
+    }
+    Ok(())
+}
+
+fn write_flags(bs: &mut TxBits, count: usize) -> Result<(), ()> {
+    for _ in 0..count {
+        push_byte_raw(bs, 0x7E)?;
+    }
+    Ok(())
+}
+
+/// Write the frame with HDLC bit-stuffing (insert 0 after any run of five 1s)
+fn write_frame_stuffed(bs: &mut TxBits, frame: &[u8]) -> Result<(), ()> {
+    let mut ones: u8 = 0;
+    for &b in frame {
+        for i in 0..8 {
+            let bit = ((b >> i) & 1) != 0;
+            bs.push_bit(bit)?;
+            if bit {
+                ones += 1;
+                if ones == 5 {
+                    bs.push_bit(false)?; // stuffed 0
+                    ones = 0;
+                }
+            } else {
+                ones = 0;
+            }
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]

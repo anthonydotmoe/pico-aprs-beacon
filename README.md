@@ -15,10 +15,10 @@ going on longer drives.
 
 - [x] Parse and extract fix data from NMEA.
 - [x] Display: Latitude, Longitude, Altitude, Fix status.
-- [ ] APRS encoder: create position beacons in AX.25.
-- [ ] Bell 202 AFSK modulator: drive output via I2S DAC.
+- [x] APRS encoder: create position beacons in AX.25.
+- [x] Bell 202 AFSK modulator: drive output via I2S DAC.
 - [ ] Persist location data in case fix is lost.
-- [ ] Timer to determine when to send a beacon.
+- [x] Timer to determine when to send a beacon.
 - [ ] Flexible enough to try again multiple times if a GPS fix isn't current enough.
 
 ## Architecture Goals

@@ -59,7 +59,16 @@ unsafe impl GlobalAlloc for Dumb {
 pub mod co {
     pub const MYCALL: &'static str = "KI7TUK-1";
     pub const TOCALL: &'static str = "APZ   ";
-    pub const UART_BUFFER_SIZE: usize = 4096;
+    /// Maximum amount of GPS UART data to buffer between the interrupt handler
+    /// and the cooperative task that performs parsing. The GPS is polled
+    /// frequently, so this can remain fairly small without risking data loss.
+    pub const GPS_UART_QUEUE_CAPACITY: usize = 512;
+    /// Maximum length of a single NMEA sentence, not including the trailing
+    /// CR/LF. The official specification limits sentences to 82 characters,
+    /// but we allow a little headroom for vendor extensions.
+    pub const GPS_MAX_SENTENCE_LEN: usize = 96;
+    /// How often (in milliseconds) the GPS task should drain the UART queue.
+    pub const GPS_TASK_POLL_INTERVAL_MS: u64 = 100;
 }
 
 // Entry point
